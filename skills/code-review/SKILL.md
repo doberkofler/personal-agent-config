@@ -11,7 +11,7 @@ Review changes along two independent axes:
 - **Spec**: does the change implement the requested behavior without omissions or scope creep?
 
 This is a read-only review. Do not modify files.
-Run the two axes in parallel subagents only after the user explicitly requests a review.
+Run the two axes in parallel subagents with fresh context windows only after the user explicitly requests a review.
 An implementation finishing is not, by itself, permission to launch a review.
 
 ## 1. Fix the review scope

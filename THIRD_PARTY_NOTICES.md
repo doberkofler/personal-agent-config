@@ -15,6 +15,7 @@ The following directories contain material copied or adapted from
 - `skills/handoff/`
 - `skills/prototype/`
 - `skills/research/`
+- `skills/retro/`
 - `skills/tdd/`
 - `skills/wait-what/`
 - `skills/writing-for-agents/`

@@ -188,6 +188,7 @@ directory.
 | [oracle-local](skills/oracle-local/SKILL.md) | Query, test, and validate against a local Oracle database |
 | [prototype](skills/prototype/SKILL.md) | Build a throwaway prototype to answer a design question |
 | [research](skills/research/SKILL.md) | Investigate a topic against primary sources and capture the findings |
+| [retro](skills/retro/SKILL.md) | Review a coding session for improvements to the agent environment |
 | [tdd](skills/tdd/SKILL.md) | Test-driven development and red-green-refactor |
 | [wait-what](skills/wait-what/SKILL.md) | Re-pitch the previous message when it did not land |
 | [writing-for-agents](skills/writing-for-agents/SKILL.md) | Write skills, `AGENTS.md`, and `CLAUDE.md` for agents |

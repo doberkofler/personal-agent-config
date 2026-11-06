@@ -38,8 +38,8 @@ generations is reported as a malformed block and left untouched.
 
 - Repository: [mattpocock/skills](https://github.com/mattpocock/skills)
 - Last fully audited snapshot:
-  [`b0618bc`](https://github.com/mattpocock/skills/commit/b0618bc436ad893b3c5e84e55fba86586d34a404)
-  (2026-10-08)
+  [`4ae2317`](https://github.com/mattpocock/skills/commit/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d)
+  (2026-10-31)
 - Layout: upstream category directories are flattened to `skills/<name>/`.
 - Sidecars: upstream `agents/` directories are intentionally omitted.
 
@@ -56,19 +56,19 @@ documents are not covered by that upstream notice.
 
 ### Verbatim skills
 
-- [`grill-me`](https://github.com/mattpocock/skills/tree/b0618bc/skills/productivity/grill-me)
-- [`grill-with-docs`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/grill-with-docs)
-- [`grilling`](https://github.com/mattpocock/skills/tree/b0618bc/skills/productivity/grilling)
-- [`handoff`](https://github.com/mattpocock/skills/tree/b0618bc/skills/productivity/handoff)
-- [`research`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/research)
-- [`writing-for-agents`](https://github.com/mattpocock/skills/tree/b0618bc/skills/productivity/writing-for-agents)
+- [`grill-me`](https://github.com/mattpocock/skills/tree/4ae2317/skills/productivity/grill-me)
+- [`grill-with-docs`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/grill-with-docs)
+- [`grilling`](https://github.com/mattpocock/skills/tree/4ae2317/skills/productivity/grilling)
+- [`handoff`](https://github.com/mattpocock/skills/tree/4ae2317/skills/productivity/handoff)
+- [`research`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/research)
+- [`writing-for-agents`](https://github.com/mattpocock/skills/tree/4ae2317/skills/productivity/writing-for-agents)
 
 ### Adapted skills
 
 #### `code-review`
 
 Source:
-[`code-review`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/code-review)
+[`code-review`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/code-review)
 
 Intentional differences:
 
@@ -81,7 +81,7 @@ Intentional differences:
 #### `codebase-design`
 
 Source:
-[`codebase-design`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/codebase-design)
+[`codebase-design`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/codebase-design)
 
 Intentional difference: uses the local `CONTEXT.md` domain-language convention
 instead of upstream `GLOSSARY.md`.
@@ -89,7 +89,7 @@ instead of upstream `GLOSSARY.md`.
 #### `diagnosing-bugs`
 
 Source:
-[`diagnosing-bugs`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/diagnosing-bugs)
+[`diagnosing-bugs`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/diagnosing-bugs)
 
 Intentional differences:
 
@@ -100,7 +100,7 @@ Intentional differences:
 #### `domain-modeling`
 
 Source:
-[`domain-modeling`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/domain-modeling)
+[`domain-modeling`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/domain-modeling)
 
 Intentional difference: retains `CONTEXT.md`, `CONTEXT-MAP.md`, and
 `CONTEXT-FORMAT.md` instead of upstream's `GLOSSARY` names.
@@ -108,15 +108,27 @@ Intentional difference: retains `CONTEXT.md`, `CONTEXT-MAP.md`, and
 #### `prototype`
 
 Source:
-[`prototype`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/prototype)
+[`prototype`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/prototype)
 
 Intentional difference: records the prototype branch in the implementation commit
 instead of requiring an issue tracker.
 
+#### `retro`
+
+Source:
+[`retro`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/retro)
+
+Intentional differences:
+
+- Uses each repository's applicable standards documents instead of assuming
+  `CODING_STANDARDS.md`.
+- Treats separate review as an optional workflow rather than a mandatory stage.
+- Requires evidence and a smallest concrete change for every recommendation.
+
 #### `tdd`
 
 Source:
-[`tdd`](https://github.com/mattpocock/skills/tree/b0618bc/skills/engineering/tdd)
+[`tdd`](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/tdd)
 
 Intentional differences:
 
@@ -126,7 +138,7 @@ Intentional differences:
 #### `wait-what`
 
 Source:
-[`wait-what`](https://github.com/mattpocock/skills/tree/b0618bc/skills/productivity/wait-what)
+[`wait-what`](https://github.com/mattpocock/skills/tree/4ae2317/skills/productivity/wait-what)
 
 Intentional difference: uses `CONTEXT.md` and `CONTEXT-MAP.md` instead of upstream's
 `GLOSSARY` names.
@@ -147,6 +159,9 @@ Locally authored. It has no `mattpocock/skills` source.
   [`95249b0`](https://github.com/mattpocock/skills/commit/95249b0b49782349740fd9b8c6ce32b4e59e497a).
 - `diagnosing-bugs`: prove a forced mutation landed before trusting the red from
   [`f3fc563`](https://github.com/mattpocock/skills/commit/f3fc5632f401156837ee3872f14fe33ccf1024ea).
+- `code-review`, `codebase-design`, `research`, and `grilling`: start delegated
+  work with fresh context windows from
+  [`7739eae`](https://github.com/mattpocock/skills/commit/7739eaed7f8f3915437a8def198a6d0d7206dbc7).
 
 ## Documents
 
