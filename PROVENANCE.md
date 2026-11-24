@@ -179,6 +179,10 @@ documentation. Verify version-sensitive claims against primary vendor documentat
 before changing them. Record an external source here if a future document is imported
 or substantially adapted from one.
 
+`sql-plsql-rules.md` requires uppercase keywords and lowercase non-keyword code,
+with case preserved in quoted identifiers and string literals. This is local formatting
+policy, not an Oracle requirement.
+
 Examples in the TypeScript documents are guidance; the repository never compiles, lints,
 or tests them. Consuming projects own their configurations, dependency versions,
 lockfiles, and tests, so no example is claimed to be locally verified.

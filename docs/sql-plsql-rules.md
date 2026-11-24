@@ -61,11 +61,11 @@ All functions and procedures declared **only in the package body** (i.e. not exp
 
 ```sql
 -- Public (declared in spec and body)
-function get_account_balance(p_account_id accounts.account_id%type) return number;
+FUNCTION get_account_balance(p_account_id accounts.account_id%TYPE) RETURN NUMBER;
 
 -- Private (body only)
-function get_account_balance_(p_account_id accounts.account_id%type) return number;
-procedure validate_credit_(p_account_id accounts.account_id%type);
+FUNCTION get_account_balance_(p_account_id accounts.account_id%TYPE) RETURN NUMBER;
+PROCEDURE validate_credit_(p_account_id accounts.account_id%TYPE);
 ```
 
 **Rules:**
@@ -108,10 +108,10 @@ r_new_account     -- with modifier
 ### Loop Index
 
 ```sql
-for i in 1..12 loop          -- acceptable for simple loops
-for i_month in 1..12 loop    -- more descriptive
-for r in c_discrepancies loop
-for r_emp in c_emp loop
+FOR i IN 1..12 LOOP          -- acceptable for simple loops
+FOR i_month IN 1..12 LOOP    -- more descriptive
+FOR r IN c_discrepancies LOOP
+FOR r_emp IN c_emp LOOP
 ```
 
 Never use `r1` — use a descriptive name.
@@ -121,7 +121,7 @@ Never use `r1` — use a descriptive name.
 Use `_tt` suffix for collection ("table") types:
 
 ```sql
-type account_tt is table of accounts%rowtype;
+TYPE account_tt IS TABLE OF accounts%ROWTYPE;
 l_accounts account_tt;
 l_new_accounts account_tt;
 l_old_accounts account_tt;
@@ -137,17 +137,17 @@ Distinguish collection subtypes only when necessary:
 ### PL/SQL Record Type
 
 ```sql
-type g_address_rectype is record (...);  -- formal
-type address_rectype is record (...);    -- informal
-type address is record (...);            -- acceptable when unambiguous
+TYPE g_address_rectype IS RECORD (...);  -- formal
+TYPE address_rectype IS RECORD (...);    -- informal
+TYPE address IS RECORD (...);            -- acceptable when unambiguous
 ```
 
 ### Schema-Level Object Type
 
-Use `_OT` suffix:
+Use `_ot` suffix:
 
 ```sql
-create or replace type customer_OT as object (...);
+CREATE OR REPLACE TYPE customer_ot AS OBJECT (...);
 ```
 
 ### Schema-Level Collection Type
@@ -155,11 +155,11 @@ create or replace type customer_OT as object (...);
 Define generic reusable types:
 
 ```sql
-create or replace type number_tt    as table of number(38,10);
-create or replace type integer_tt   as table of integer;
-create or replace type date_tt      as table of date;
-create or replace type varchar2_tt  as table of varchar2(4000);
-create or replace type timestamp_tt as table of timestamp;
+CREATE OR REPLACE TYPE number_tt    AS TABLE OF NUMBER(38,10);
+CREATE OR REPLACE TYPE integer_tt   AS TABLE OF INTEGER;
+CREATE OR REPLACE TYPE date_tt      AS TABLE OF DATE;
+CREATE OR REPLACE TYPE varchar2_tt  AS TABLE OF VARCHAR2(4000);
+CREATE OR REPLACE TYPE timestamp_tt AS TABLE OF TIMESTAMP;
 ```
 
 ## Package Structure
@@ -169,8 +169,8 @@ A package consists of two files: the spec (`.pkg`) and the body (`.pkb`). Struct
 ### Package Spec
 
 ```sql
-create or replace
-package my_package is
+CREATE OR REPLACE
+PACKAGE my_package IS
 
 ------------
 --  OVERVIEW
@@ -211,9 +211,9 @@ package my_package is
 *	@param p_parameter  description
 *	@return             description
 */
-function my_public(p_parameter in varchar2) return varchar2;
+FUNCTION my_public(p_parameter IN VARCHAR2) RETURN VARCHAR2;
 
-end my_package;
+END my_package;
 /
 ```
 
@@ -226,8 +226,8 @@ end my_package;
 ### Package Body
 
 ```sql
-create or replace
-package body my_package is
+CREATE OR REPLACE
+PACKAGE BODY my_package IS
 
 ----------------------------------------------------------
 --	PRIVATE EXCEPTIONS
@@ -251,7 +251,7 @@ package body my_package is
 
 -- Forward declarations: only needed when a private subprogram
 -- is called before its full definition appears in this file.
-function my_private_(p_parameter in varchar2) return varchar2;
+FUNCTION my_private_(p_parameter IN VARCHAR2) RETURN VARCHAR2;
 
 ----------------------------------------------------------
 --	GLOBAL MODULES
@@ -261,20 +261,20 @@ function my_private_(p_parameter in varchar2) return varchar2;
 *	Implementation of public subprograms first,
 *	then full definitions of private subprograms.
 */
-function my_public(p_parameter in varchar2) return varchar2
-is
-begin
-	return my_private_(p_parameter => p_parameter);
-end my_public;
+FUNCTION my_public(p_parameter IN VARCHAR2) RETURN VARCHAR2
+IS
+BEGIN
+	RETURN my_private_(p_parameter => p_parameter);
+END my_public;
 
 
-function my_private_(p_parameter in varchar2) return varchar2
-is
-begin
-	return p_parameter;
-end my_private_;
+FUNCTION my_private_(p_parameter IN VARCHAR2) RETURN VARCHAR2
+IS
+BEGIN
+	RETURN p_parameter;
+END my_private_;
 
-end my_package;
+END my_package;
 /
 ```
 
@@ -285,20 +285,20 @@ end my_package;
 - Add a forward declaration only when required to resolve a forward reference — do not declare all private subprograms upfront as a matter of habit.
 - Within GLOBAL MODULES, place public subprogram implementations first, private implementations after. This makes the public interface immediately visible when reading the body.
 - Use `/*  */` block comments (not JSDoc) for implementation notes inside the body; JSDoc belongs only on the spec signatures.
-- The `end <subprogram_name>;` label is mandatory on every subprogram — match the name exactly, including the trailing `_` for private subprograms.
+- The `END <subprogram_name>;` label is mandatory on every subprogram — match the name exactly, including the trailing `_` for private subprograms.
 
 ### Standalone Procedure/Function Structure
 
 For standalone `.prc` / `.fnc` files the same section discipline applies, collapsed into a single unit:
 
 ```sql
-create or replace
-procedure my_procedure
-    ( p_account_id  accounts.account_id%type
-    , p_result_out  varchar2 )
-is
+CREATE OR REPLACE
+PROCEDURE my_procedure
+    ( p_account_id  accounts.account_id%TYPE
+    , p_result_out  VARCHAR2 )
+IS
 	-- constants
-	k_max_retries constant pls_integer := 3;
+	k_max_retries CONSTANT pls_integer := 3;
 
 	-- types
 
@@ -308,14 +308,14 @@ is
 	-- cursors
 
 	-- local (private) subprograms
-	procedure validate_(p_id in accounts.account_id%type) is
-	begin
+	PROCEDURE validate_(p_id IN accounts.account_id%TYPE) IS
+	BEGIN
 		...
-	end validate_;
+	END validate_;
 
-begin
+BEGIN
 	...
-end my_procedure;
+END my_procedure;
 /
 ```
 
@@ -338,25 +338,23 @@ end my_procedure;
 
 ### Case Convention
 
-Options (pick one and be consistent):
-
-1. Uppercase keywords, lowercase everything else _(traditional)_
-2. **Lowercase everything**
+Uppercase SQL and PL/SQL keywords; lowercase all other code tokens.
+Preserve case in quoted identifiers and string literals.
 
 ### Procedure/Function Declarations
 
 First parameter on new line; one parameter per line; closing paren on last parameter line:
 
 ```sql
-function invoice_address
-    ( p_account_id  accounts.account_id%type
-    , p_date        date )
-    return address;
+FUNCTION invoice_address
+    ( p_account_id  accounts.account_id%TYPE
+    , p_date        DATE )
+    RETURN address;
 
-procedure do_stuff_rather_long_name
-    ( p_first_parameter   boolean default false
-    , p_second_parameter  service_agreement.agreement_status%type default 2
-    , p_third_parameter   currency_amount default 0 );
+PROCEDURE do_stuff_rather_long_name
+    ( p_first_parameter   BOOLEAN DEFAULT FALSE
+    , p_second_parameter  service_agreement.agreement_status%TYPE DEFAULT 2
+    , p_third_parameter   currency_amount DEFAULT 0 );
 ```
 
 ### Variable Assignments
@@ -373,7 +371,7 @@ l_firstname := 'Dimitri';
 l_lastname  := 'Papadopoulos';
 
 -- Preferred: assign at declaration
-l_firstname employees.firstname%type := 'Dimitri';
+l_firstname employees.firstname%TYPE := 'Dimitri';
 ```
 
 ### Multi-Line Statements
@@ -412,40 +410,40 @@ upload_sales
 
 ### Conditional Statements
 
-Brackets are optional — PL/SQL has `then` to terminate conditions:
+Brackets are optional — PL/SQL has `THEN` to terminate conditions:
 
 ```sql
 -- Bad
-if ((x = 1) and (y = 2)) then
+IF ((x = 1) AND (y = 2)) THEN
 
 -- Good
-if (x = 1) then
-if x = 1 then
-if x = 1 and y = 2 then
-if (x = 1 and y = 2) then
+IF (x = 1) THEN
+IF x = 1 THEN
+IF x = 1 AND y = 2 THEN
+IF (x = 1 AND y = 2) THEN
 ```
 
-Boolean operators (`and`/`or`) go at the **start** of the line, not end:
+Boolean operators (`AND`/`OR`) go at the **start** of the line, not end:
 
 ```sql
 -- Bad
-if to_char(sysdate,'D') > 1 and
-   mypackage.myprocedure(1,2,3,4) not between 1 and 99 then
+IF to_char(SYSDATE,'D') > 1 AND
+   mypackage.myprocedure(1,2,3,4) NOT BETWEEN 1 AND 99 THEN
 
 -- Good
-if to_char(sysdate,'D') > 1
-and mypackage.myprocedure(1,2,3,4) not between 1 and 99
-then
+IF to_char(SYSDATE,'D') > 1
+AND mypackage.myprocedure(1,2,3,4) NOT BETWEEN 1 AND 99
+THEN
 ```
 
 Mixed OR/AND — align bracketed conditions vertically:
 
 ```sql
-if a = 1
-and (   b = 2
-     or c = 3
-     or d = 4 )
-then
+IF a = 1
+AND (   b = 2
+     OR c = 3
+     OR d = 4 )
+THEN
 ```
 
 ### Loops
@@ -455,14 +453,14 @@ then
 - Anonymous cursor FOR loops are acceptable:
 
 ```sql
-for r in (
-    select e.employee_id, e.first_name
-    from   employees e
-    order by 1
+FOR r IN (
+    SELECT e.employee_id, e.first_name
+    FROM   employees e
+    ORDER BY 1
 )
-loop
+LOOP
     ...
-end loop;
+END LOOP;
 ```
 
 Use `OPEN-FETCH-EXIT-CLOSE` only when:
@@ -476,37 +474,37 @@ Use boolean expressions directly — do not use IF to assign TRUE/FALSE:
 
 ```sql
 -- Bad
-if hiredate < sysdate then
-    date_in_past := true;
-else
-    date_in_past := false;
-end if;
+IF hiredate < SYSDATE THEN
+    date_in_past := TRUE;
+ELSE
+    date_in_past := FALSE;
+END IF;
 
 -- Good
-date_in_past := hiredate < sysdate;
+date_in_past := hiredate < SYSDATE;
 
 -- Bad (function return)
-if total_sal > 10000 then
-    return true;
-else
-    return false;
-end if;
+IF total_sal > 10000 THEN
+    RETURN TRUE;
+ELSE
+    RETURN FALSE;
+END IF;
 
 -- Good
-return total_sal > 10000;
+RETURN total_sal > 10000;
 ```
 
 Use boolean variables to name complex conditions:
 
 ```sql
 eligible_for_raise :=
-    total_sal between 10000 and 50000
-    and emp_status(emp_rec.empno) = 'N'
-    and months_between(emp_rec.hiredate, sysdate) > 10;
+    total_sal BETWEEN 10000 AND 50000
+    AND emp_status(emp_rec.empno) = 'N'
+    AND months_between(emp_rec.hiredate, SYSDATE) > 10;
 
-if eligible_for_raise then
+IF eligible_for_raise THEN
     give_raise(emp_rec.empno);
-end if;
+END IF;
 ```
 
 ### Prefer SQL Over PL/SQL
@@ -515,16 +513,16 @@ SQL is almost always faster. Replace PL/SQL loops with single SQL statements whe
 
 ```sql
 -- Bad: 20 INSERT statements
-for i_year in 1..20 loop
-    insert into table1
-    select * from table2
-    where  starting_year = i_year;
-end loop;
+FOR i_year IN 1..20 LOOP
+    INSERT INTO table1
+    SELECT * FROM table2
+    WHERE  starting_year = i_year;
+END LOOP;
 
 -- Good: 1 INSERT statement
-insert into table1
-select * from table2
-where  starting_year between 1 and 20;
+INSERT INTO table1
+SELECT * FROM table2
+WHERE  starting_year BETWEEN 1 AND 20;
 ```
 
 ### Constants
@@ -534,8 +532,8 @@ where  starting_year between 1 and 20;
 - If a variable never changes, convert it to a constant.
 
 ```sql
-k_ship_express  constant varchar2(10) := 'EXPRESS';
-k_ship_standard constant varchar2(10) := 'STANDARD';
+k_ship_express  CONSTANT VARCHAR2(10) := 'EXPRESS';
+k_ship_standard CONSTANT VARCHAR2(10) := 'STANDARD';
 ```
 
 ### Variable Discipline
@@ -549,16 +547,16 @@ Always anchor variable types to column definitions:
 
 ```sql
 -- Bad
-procedure format_customer ( p_customer_id integer )
-is
-    l_first_name  varchar2(30);
-    l_last_name   varchar2(30);
+PROCEDURE format_customer ( p_customer_id INTEGER )
+IS
+    l_first_name  VARCHAR2(30);
+    l_last_name   VARCHAR2(30);
 
 -- Good
-procedure format_customer ( p_customer_id customers.cst_id%type )
-is
-    l_first_name  customers.cst_first_name%type;
-    l_last_name   customers.cst_last_name%type;
+PROCEDURE format_customer ( p_customer_id customers.cst_id%TYPE )
+IS
+    l_first_name  customers.cst_first_name%TYPE;
+    l_last_name   customers.cst_last_name%TYPE;
 ```
 
 Benefits: stays in sync with schema changes; self-documents the relationship to DB columns.
@@ -566,7 +564,7 @@ Benefits: stays in sync with schema changes; self-documents the relationship to 
 ### Use `%ROWTYPE` for Records
 
 ```sql
-r_employee employees%rowtype;
+r_employee employees%ROWTYPE;
 ```
 
 ### Subtypes
@@ -575,30 +573,30 @@ Create subtypes to document business intent, not technical detail:
 
 ```sql
 -- Bad subtype (just adds noise)
-subtype emp240_rtyp is c_emp240%rowtype;
+SUBTYPE emp240_rtyp IS c_emp240%ROWTYPE;
 
 -- Good subtype (documents business concept)
-subtype money is stock_items.unit_price%type;
-subtype room_number is rooms.room_number%type;
+SUBTYPE money IS stock_items.unit_price%TYPE;
+SUBTYPE room_number IS rooms.room_number%TYPE;
 ```
 
 Consider a dedicated package containing only standard subtypes, constants, and variable declarations.
 
 ## Exception Handling
 
-### Prefer `RAISE_APPLICATION_ERROR` Over Named Exceptions
+### Prefer `raise_application_error` Over Named Exceptions
 
 Named exceptions carry no explanatory message:
 
 ```sql
 -- Bad: no diagnostic info
-raise errorpkg.fatal_error;
+RAISE errorpkg.fatal_error;
 
 -- Good: stack trace + context
 raise_application_error
 ( errorpkg.k_fatal_error
 , 'Credit check failed for account ' || r_acc.acc_id
-, true );
+, TRUE );
 ```
 
 ### Error Code Strategy
@@ -606,7 +604,7 @@ raise_application_error
 For most applications, one error code per package (or even one for the whole application) is sufficient:
 
 ```sql
-k_error_code constant pls_integer := -20042;
+k_error_code CONSTANT pls_integer := -20042;
 ```
 
 Then use `k_error_code` in all `raise_application_error` calls within that package.
@@ -619,7 +617,7 @@ l_error_text := 'Invalid account ' || r_acc.acc_id;
 error_pkg.log_and_raise(errorpkg.k_invalid_account, l_error_text);
 ```
 
-Only log at the topmost error-handling level; propagate via `raise_application_error` with `true` (preserve stack).
+Only log at the topmost error-handling level; propagate via `raise_application_error` with `TRUE` (preserve stack).
 
 ### Keep It Simple
 
@@ -633,46 +631,46 @@ Use the same left-alignment rules as PL/SQL. The "right-gutter" alignment style 
 
 ```sql
 -- Bad (right-gutter)
-select last_name, first_name
-  from employees
- where department_id = 15
-   and hire_date < sysdate;
+SELECT last_name, first_name
+  FROM employees
+ WHERE department_id = 15
+   AND hire_date < SYSDATE;
 
 -- Good (left-aligned)
-select last_name, first_name
-from   employees
-where  department_id = 15
-and    hire_date < sysdate;
+SELECT last_name, first_name
+FROM   employees
+WHERE  department_id = 15
+AND    hire_date < SYSDATE;
 ```
 
 ### One Expression Per Line
 
 ```sql
-select e.last_name
+SELECT e.last_name
      , c.name
      , max(sh.salary) best_salary_ever
-from   employees e
-       join companies c
-            on  c.company_id = e.company_id
-       join salary_history sh
-            on  sh.employee_id = e.employee_id
-where  e.hire_date > add_months(sysdate, -60)
-and    exists
-       ( select 1
-         from   some_other_table ot
-         where  ot.employee_id = e.employee_id )
-group by e.last_name, c.name
-order by e.last_name, c.name;
+FROM   employees e
+       JOIN companies c
+            ON  c.company_id = e.company_id
+       JOIN salary_history sh
+            ON  sh.employee_id = e.employee_id
+WHERE  e.hire_date > add_months(SYSDATE, -60)
+AND    EXISTS
+       ( SELECT 1
+         FROM   some_other_table ot
+         WHERE  ot.employee_id = e.employee_id )
+GROUP BY e.last_name, c.name
+ORDER BY e.last_name, c.name;
 ```
 
 ### INSERT Column List
 
 ```sql
-insert into employees
+INSERT INTO employees
 ( emp_id
 , emp_firstname
 , emp_lastname )
-values
+VALUES
 ( emp_seq.nextval
 , r_emp.firstname
 , r_emp.lastname );
@@ -681,10 +679,10 @@ values
 ### UPDATE
 
 ```sql
-update employees
-set    salary = salary * l_raise_factor
-where  department_id = l_department_id
-and    termination_date is null;
+UPDATE employees
+SET    salary = salary * l_raise_factor
+WHERE  department_id = l_department_id
+AND    termination_date IS NULL;
 ```
 
 ### Blank Lines
@@ -698,10 +696,10 @@ Use **meaningful abbreviations** based on the table name — not `a`, `b`, `c`:
 
 ```sql
 -- Bad
-from employees a join companies b on b.com_id = a.emp_com_id
+FROM employees a JOIN companies b ON b.com_id = a.emp_com_id
 
 -- Good
-from employees emp join companies com on com.com_id = emp.emp_com_id
+FROM employees emp JOIN companies com ON com.com_id = emp.emp_com_id
 ```
 
 Consistent alias length (e.g. 3 chars) is fine; clarity is the goal.
@@ -712,21 +710,21 @@ Use explicit `JOIN ... ON` syntax. Implicit comma joins are not acceptable:
 
 ```sql
 -- Bad (implicit join)
-from employees e, departments d
-where d.department_id = e.department_id
+FROM employees e, departments d
+WHERE d.department_id = e.department_id
 
 -- Good (ANSI)
-from employees e
-     join departments d
-          on  d.department_id = e.department_id
+FROM employees e
+     JOIN departments d
+          ON  d.department_id = e.department_id
 ```
 
-Two spaces after `on` so that `and` conditions align with the `on` column:
+Two spaces after `ON` so that `AND` conditions align with the `ON` column:
 
 ```sql
-join departments d
-     on  d.department_id = e.department_id
-     and d.active_flag = 'Y'
+JOIN departments d
+     ON  d.department_id = e.department_id
+     AND d.active_flag = 'Y'
 ```
 
 Join conditions should flow in the same left-to-right order as the FROM clause.
