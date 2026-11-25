@@ -14,6 +14,19 @@ VERSION = "v1.2.3"
 TAG_REF = f"refs/tags/{VERSION}"
 
 
+class ReleaseEntrypointTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "Direct script execution requires POSIX.")
+    def test_release_script_runs_directly(self) -> None:
+        result = subprocess.run(
+            [str(REPO_ROOT / "release.py"), "--help"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("usage: release.py", result.stdout)
+
+
 class ReleaseTests(unittest.TestCase):
     def setUp(self) -> None:
         tmp = tempfile.TemporaryDirectory()
