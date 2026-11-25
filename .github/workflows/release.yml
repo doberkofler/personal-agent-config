@@ -23,7 +23,7 @@ jobs:
         run: python3 -m unittest discover -s tests -t . -v
 
       - name: Build artifact and checksum
-        run: python3 release.py --version "${GITHUB_REF_NAME}" --output dist
+        run: python3 scripts/build-release-artifacts.py --version "${GITHUB_REF_NAME}" --output dist
 
       - name: Show checksum
         run: cat dist/SHA256SUMS

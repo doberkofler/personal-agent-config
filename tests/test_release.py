@@ -1,73 +1,147 @@
-"""Release artifact tests for ``release.py``.
-
-The script builds from ``git archive HEAD``, so these tests exercise the real
-release path against the repository checkout without writing into it.
-"""
+"""Exercise the maintainer release command against an isolated Git remote."""
 from __future__ import annotations
 
-import hashlib
+import os
+import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
 import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-RELEASE_SCRIPT = REPO_ROOT / "release.py"
-VERSION = "v0.0.0-test"
-
-
-def run_release(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [sys.executable, str(RELEASE_SCRIPT), *args],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
+VERSION = "v1.2.3"
+TAG_REF = f"refs/tags/{VERSION}"
 
 
 class ReleaseTests(unittest.TestCase):
     def setUp(self) -> None:
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        self.output = Path(self._tmp.name)
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        self.repo = root / "repo"
+        self.remote = root / "origin.git"
+        self.repo.mkdir()
+        self.env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+        self.git("init", "--bare", str(self.remote))
+        self.git("init", "--initial-branch=main")
+        self.git("config", "user.name", "Release Test")
+        self.git("config", "user.email", "release-test@example.invalid")
+        shutil.copy2(REPO_ROOT / "release.py", self.repo)
+        (self.repo / "scripts").mkdir()
+        for name in ("__init__.py", "release_version.py"):
+            shutil.copy2(REPO_ROOT / "scripts" / name, self.repo / "scripts")
+        self.git("add", "release.py", "scripts")
+        self.git("commit", "-m", "Release candidate")
+        self.git("remote", "add", "origin", str(self.remote))
+        self.git("push", "origin", "main")
 
-    def test_build_produces_archive_and_checksum(self) -> None:
-        result = run_release("--version", VERSION, "--output", str(self.output))
-        self.assertEqual(0, result.returncode, result.stderr)
+    def git(self, *args: str, cwd: Path | None = None) -> str:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=cwd if cwd is not None else self.repo,
+            env=self.env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip()
 
-        archive = self.output / f"personal-agent-config-{VERSION}.tar.gz"
-        checksums = self.output / "SHA256SUMS"
-        self.assertTrue(archive.is_file())
-        self.assertTrue(checksums.is_file())
-
-        digest = hashlib.sha256(archive.read_bytes()).hexdigest()
-        self.assertIn(digest, result.stdout)
-        self.assertEqual(
-            f"{digest}  {archive.name}\n", checksums.read_text(encoding="utf-8")
+    def release(self, answers: str = f"{VERSION}\nyes\n") -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, str(self.repo / "release.py")],
+            cwd=self.repo,
+            env=dict(self.env, PYTHONDONTWRITEBYTECODE="1"),
+            input=answers,
+            capture_output=True,
+            text=True,
         )
 
-    def test_archive_contains_tracked_content_at_release_root(self) -> None:
-        result = run_release("--version", VERSION, "--output", str(self.output))
+    def assert_no_release_tag(self) -> None:
+        self.assertEqual("", self.git("tag", "--list", VERSION))
+        self.assertEqual("", self.git("tag", "--list", VERSION, cwd=self.remote))
+
+    def test_pushes_only_the_confirmed_annotated_tag(self) -> None:
+        self.git("tag", "-a", "v0.0.1", "-m", "Do not publish")
+        self.git("config", "push.followTags", "true")
+        commit = self.git("rev-parse", "HEAD")
+        result = self.release()
         self.assertEqual(0, result.returncode, result.stderr)
-        archive = self.output / f"personal-agent-config-{VERSION}.tar.gz"
+        self.assertIn(f"{VERSION} -> {commit}", result.stdout)
+        self.assertEqual(VERSION, self.git("tag", "--list", cwd=self.remote))
+        self.assertEqual("tag", self.git("cat-file", "-t", TAG_REF, cwd=self.remote))
+        self.assertEqual(commit, self.git("rev-parse", f"{TAG_REF}^{{commit}}", cwd=self.remote))
 
-        with tarfile.open(archive, "r:gz") as tar:
-            names = set(tar.getnames())
-
-        prefix = f"personal-agent-config-{VERSION}/"
-        self.assertIn(prefix + "sync_ai_rules.py", names)
-        self.assertIn(prefix + "docs/lint-rules.md", names)
-        self.assertIn(prefix + "LICENSE", names)
-        # git archive includes only tracked content, so the temporary plan file
-        # can never ship in a release.
-        self.assertNotIn(prefix + "todo.md", names)
+    def test_declining_leaves_both_repositories_untagged(self) -> None:
+        result = self.release(f"{VERSION}\n\n")
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("Cancelled", result.stdout)
+        self.assert_no_release_tag()
 
     def test_invalid_version_is_rejected(self) -> None:
-        result = run_release("--version", "1.0.0", "--output", str(self.output))
+        for version in ("1.2.3", "v1.2.3-rc..1"):
+            with self.subTest(version=version):
+                result = self.release(f"{version}\nyes\n")
+                self.assertNotEqual(0, result.returncode)
+                self.assertIn("Invalid version", result.stderr)
+        self.assertEqual("", self.git("tag", "--list"))
+        self.assertEqual("", self.git("tag", "--list", cwd=self.remote))
+
+    def test_dirty_worktree_is_rejected(self) -> None:
+        (self.repo / "notes.txt").write_text("untracked\n", encoding="utf-8")
+        result = self.release()
         self.assertNotEqual(0, result.returncode)
-        self.assertIn("invalid version", result.stderr)
+        self.assertIn("clean working tree", result.stderr)
+        self.assert_no_release_tag()
+
+    def test_non_main_branch_is_rejected(self) -> None:
+        self.git("switch", "-c", "feature")
+        result = self.release()
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("main branch", result.stderr)
+        self.assert_no_release_tag()
+
+    def test_checks_current_remote_main_not_cached_tracking_ref(self) -> None:
+        other = self.repo.parent / "other"
+        self.git("clone", "--branch", "main", str(self.remote), str(other))
+        self.git(
+            "-c", "user.name=Release Test",
+            "-c", "user.email=release-test@example.invalid",
+            "commit", "--allow-empty", "-m", "Advance remote",
+            cwd=other,
+        )
+        self.git("push", "origin", "main", cwd=other)
+        self.assertEqual(self.git("rev-parse", "HEAD"), self.git("rev-parse", "origin/main"))
+
+        result = self.release()
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("does not match origin/main", result.stderr)
+        self.assert_no_release_tag()
+
+    def test_existing_local_tag_is_rejected(self) -> None:
+        self.git("tag", VERSION)
+        result = self.release()
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("already exists locally", result.stderr)
+        self.assertEqual("", self.git("tag", "--list", cwd=self.remote))
+
+    def test_existing_remote_tag_is_rejected(self) -> None:
+        self.git("tag", VERSION)
+        self.git("push", "origin", TAG_REF)
+        self.git("tag", "-d", VERSION)
+
+        result = self.release()
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("already exists on origin", result.stderr)
+        self.assertEqual("", self.git("tag", "--list"))
+
+    def test_failed_push_reports_retained_local_tag(self) -> None:
+        self.git("remote", "set-url", "--push", "origin", str(self.repo.parent / "missing"))
+        result = self.release()
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn(f"Local tag {VERSION} was kept", result.stderr)
+        self.assertEqual(VERSION, self.git("tag", "--list"))
+        self.assertEqual("", self.git("tag", "--list", cwd=self.remote))
 
 
 if __name__ == "__main__":

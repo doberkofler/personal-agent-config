@@ -54,7 +54,8 @@ class IdentityTests(unittest.TestCase):
     def test_repository_identity_is_consistent(self) -> None:
         root = validators.REPO_ROOT
         sync = (root / "sync_ai_rules.py").read_text(encoding="utf-8")
-        release = (root / "release.py").read_text(encoding="utf-8")
+        builder_path = "scripts/build-release-artifacts.py"
+        builder = (root / builder_path).read_text(encoding="utf-8")
         readme = (root / "README.md").read_text(encoding="utf-8")
         workflow = (root / ".github" / "workflows" / "release.yml").read_text(
             encoding="utf-8"
@@ -64,7 +65,8 @@ class IdentityTests(unittest.TestCase):
             'REPO_URL = "https://github.com/doberkofler/personal-agent-config.git"',
             sync,
         )
-        self.assertIn('ARCHIVE_STEM = "personal-agent-config-"', release)
+        self.assertIn('ARCHIVE_STEM = "personal-agent-config-"', builder)
+        self.assertIn(f"python3 {builder_path} --version", workflow)
         self.assertIn("dist/personal-agent-config-*.tar.gz", workflow)
         self.assertTrue(
             readme.startswith("# Personal Agent Configuration\n"), readme[:40]

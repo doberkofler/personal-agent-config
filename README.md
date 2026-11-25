@@ -121,15 +121,6 @@ protect against a compromised GitHub account, a malicious maintainer, or a
 tampered release. Pin an explicit `VERSION`, download only over HTTPS from this
 repository, and review the script before running it.
 
-### Notes
-
-Maintainers cut a release by pushing a `v*` tag; CI runs `release.py`, which
-builds `dist/personal-agent-config-<tag>.tar.gz` and `dist/SHA256SUMS` and attaches
-both to the GitHub release.
-
-See [`PROVENANCE.md`](PROVENANCE.md) for content origins, intentional adaptations,
-upstream maintenance, distribution behavior, and the release process.
-
 ### Verification
 
 This repository distributes documentation. It has no Node toolchain and does not compile,
@@ -142,6 +133,23 @@ python3 sync_ai_rules.py --check
 ```
 
 Distribution integrity must report `ok`.
+
+## Cut a release
+
+From a clean `main` checkout that matches `origin/main`, run:
+
+```bash
+python3 release.py
+```
+
+Enter an unused version such as `v1.0.0`. Review the commit and confirm to create
+and push the annotated tag. [GitHub Actions](.github/workflows/release.yml) tests
+the tagged commit, builds the archive and checksum, and publishes both to
+[GitHub Releases](https://github.com/doberkofler/personal-agent-config/releases).
+Local installation is a separate step.
+
+See [`PROVENANCE.md`](PROVENANCE.md) for content origins, intentional adaptations,
+upstream maintenance, distribution behavior, and the release process.
 
 ## What gets installed
 

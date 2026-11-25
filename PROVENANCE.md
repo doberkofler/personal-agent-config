@@ -333,12 +333,16 @@ repository managed.
 
 ### Release artifacts and trust model
 
-The recommended installation no longer executes from mutable `main`. Pushing an
-annotated `v*` tag triggers `.github/workflows/release.yml`, which runs the test suite,
-then `release.py` builds `dist/personal-agent-config-<tag>.tar.gz` (via `git archive` at
-the tagged commit) and `dist/SHA256SUMS`, and `gh release create` attaches both to the
-GitHub release. A checked-out tag is immutable; the installer detects a fixed checkout
-and skips `git pull`.
+The recommended installation no longer executes from mutable `main`.
+Maintainers run `python3 release.py` to enter a version, verify a clean `main` that
+matches `origin/main`, and confirm creation and push of one annotated tag.
+The command does not build, publish, or install artifacts itself.
+
+Pushing the tag triggers `.github/workflows/release.yml`, which runs the test suite.
+The internal `scripts/build-release-artifacts.py` builds
+`dist/personal-agent-config-<tag>.tar.gz` (via `git archive` at the tagged commit) and
+`dist/SHA256SUMS`. GitHub Actions attaches both to the release with `gh release create`.
+The installer detects a checkout at a fixed revision and skips `git pull`.
 
 The checksum confirms that the downloaded archive matches the published artifact. It
 does **not** protect against a compromised GitHub account, a malicious maintainer, or a

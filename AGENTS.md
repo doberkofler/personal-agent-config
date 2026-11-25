@@ -4,7 +4,11 @@ This document provides instructions for agentic coding assistants operating in t
 
 ## 1. Build, Lint, and Test Commands
 
-The repository distributes Markdown rules, commands, and skills, and it ships executable Python: `sync_ai_rules.py` (local distribution), `release.py` (release artifacts), and the suite in `tests/`. Validation is automated — CI runs `python3 -m unittest discover -s tests -t .`, which enforces Markdown structure, frontmatter, internal links, README index coverage, and provenance coverage.
+The repository distributes Markdown rules, commands, and skills.
+It ships Python for local distribution (`sync_ai_rules.py`), cutting releases (`release.py`),
+and building release artifacts (`scripts/build-release-artifacts.py`).
+CI runs `python3 -m unittest discover -s tests -t .` to validate behavior, Markdown structure,
+frontmatter, internal links, README index coverage, and provenance coverage.
 
 ### Quality Assurance Protocol
 - **Markdown Linting:** 
