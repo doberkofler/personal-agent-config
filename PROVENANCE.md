@@ -212,6 +212,10 @@ TypeScript module guidance and the Node.js TypeScript documentation. No profile 
 represented as universally applicable, and no example is claimed to be locally
 compiler-tested.
 
+The compiler profiles prefer `ES2024` for new projects, with lower targets for older runtimes.
+This is local policy, informed by the [target reference](https://www.typescriptlang.org/tsconfig/target.html)
+and [TypeScript 5.7 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-7.html).
+
 The runtime-validation guidance requires schema validation before domain use, prefers
 inline `JSON.parse()` validation to avoid an unvalidated intermediate value, permits an
 explicitly typed staged parse when syntax and shape failures must be distinguished, and

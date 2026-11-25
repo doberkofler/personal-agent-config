@@ -170,6 +170,11 @@ Runtime, module, and emit settings belong to a profile, not the universal baseli
 exactly one profile per project or package, and keep inherited options internally
 compatible.
 
+Prefer `target: "ES2024"` for new projects using TypeScript 5.7 or newer.
+Choose a lower target, such as `ES2022`, when the oldest supported runtime needs it.
+Match library types to runtime APIs: `target` changes the default `lib`, but does not
+polyfill missing APIs.
+
 ### Bundler-owned application
 
 Use when a bundler owns JavaScript output:
@@ -177,7 +182,7 @@ Use when a bundler owns JavaScript output:
 ```json
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ES2024",
 		"module": "Preserve",
 		"moduleResolution": "Bundler",
 		"noEmit": true,
@@ -186,6 +191,7 @@ Use when a bundler owns JavaScript output:
 }
 ```
 
+- Set the deployment target in the bundler; TypeScript does not emit the bundle.
 - Add `allowImportingTsExtensions: true` only when the bundler accepts TypeScript
   extensions.
 - `Preserve` reflects what most modern bundlers and Bun accept. A project that uses
@@ -198,7 +204,7 @@ Use `"type": "module"` in `package.json` or `.mts` files, with:
 ```json
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ES2024",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"verbatimModuleSyntax": true
@@ -243,7 +249,7 @@ TypeScript 5.7 or newer can rewrite supported relative TypeScript extensions:
 ```json
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ES2024",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"rewriteRelativeImportExtensions": true,
