@@ -7,10 +7,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from scripts.release_version import is_release_version
+from scripts.release_version import is_release_version, suggest_version
 
 REPO_ROOT = Path(__file__).resolve().parent
 MAIN_REF = "refs/heads/main"
+TAG_REF_PREFIX = "refs/tags/"
 
 
 class ReleaseError(Exception):
@@ -30,10 +31,29 @@ def git(*args: str) -> str:
     return result.stdout.strip()
 
 
+def origin_refs(*patterns: str) -> dict[str, str]:
+    refs: dict[str, str] = {}
+    for line in git("ls-remote", "--refs", "origin", *patterns).splitlines():
+        object_id, ref = line.split("\t", 1)
+        refs[ref] = object_id
+    return refs
+
+
+def prompt_version() -> str:
+    tags = (
+        ref.removeprefix(TAG_REF_PREFIX)
+        for ref in origin_refs(f"{TAG_REF_PREFIX}v*")
+        if ref.startswith(TAG_REF_PREFIX)
+    )
+    latest, suggested = suggest_version(tags)
+    print(f"Latest stable tag on origin: {latest or 'none'}")
+    return input(f"Release version [{suggested}]: ").strip() or suggested
+
+
 def validate_version(version: str) -> str:
     if not is_release_version(version):
         raise ReleaseError(f"Invalid version {version!r}; expected a tag like v1.2.3.")
-    tag_ref = f"refs/tags/{version}"
+    tag_ref = f"{TAG_REF_PREFIX}{version}"
     try:
         git("check-ref-format", tag_ref)
     except ReleaseError as error:
@@ -51,10 +71,7 @@ def release_candidate(version: str, tag_ref: str) -> str:
 
     commit = git("rev-parse", "--verify", "HEAD")
     # Read origin directly; the local tracking ref may be stale.
-    remote_refs: dict[str, str] = {}
-    for line in git("ls-remote", "--refs", "origin", MAIN_REF, tag_ref).splitlines():
-        object_id, ref = line.split("\t", 1)
-        remote_refs[ref] = object_id
+    remote_refs = origin_refs(MAIN_REF, tag_ref)
     if tag_ref in remote_refs:
         raise ReleaseError(f"Tag {version} already exists on origin.")
     if MAIN_REF not in remote_refs:
@@ -65,7 +82,7 @@ def release_candidate(version: str, tag_ref: str) -> str:
 
 
 def cut_release() -> None:
-    version = input("Release version (e.g. v1.2.3): ").strip()
+    version = prompt_version()
     tag_ref = validate_version(version)
     commit = release_candidate(version, tag_ref)
     print(f"{version} -> {commit} (origin/main)")

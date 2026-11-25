@@ -334,8 +334,11 @@ repository managed.
 ### Release artifacts and trust model
 
 The recommended installation no longer executes from mutable `main`.
-Maintainers run `python3 release.py` to enter a version, verify a clean `main` that
-matches `origin/main`, and confirm creation and push of one annotated tag.
+Maintainers run `python3 release.py` to cut a release.
+The prompt uses the highest stable `vX.Y.Z` tag directly from `origin` to suggest the
+next patch, or `v1.0.0` if no stable tag exists.
+The command verifies a clean `main` that matches `origin/main` and requires confirmation
+before creating and pushing one annotated tag.
 The command does not build, publish, or install artifacts itself.
 
 Pushing the tag triggers `.github/workflows/release.yml`, which runs the test suite.

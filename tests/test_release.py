@@ -74,6 +74,27 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual("", self.git("tag", "--list", VERSION))
         self.assertEqual("", self.git("tag", "--list", VERSION, cwd=self.remote))
 
+    def test_suggests_v1_for_an_untagged_origin(self) -> None:
+        result = self.release("\nyes\n")
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("Latest stable tag on origin: none", result.stdout)
+        self.assertIn("Release version [v1.0.0]", result.stdout)
+        self.assertEqual("v1.0.0", self.git("tag", "--list", cwd=self.remote))
+
+    def test_suggests_next_patch_from_highest_stable_origin_tag(self) -> None:
+        remote_tags = ("v1.9.99", "v1.10.9", "v2.0.0-rc.1", "v20.0.0+build", "nightly")
+        for tag in remote_tags:
+            self.git("tag", tag)
+        self.git("push", "origin", *(f"refs/tags/{tag}" for tag in remote_tags))
+        self.git("tag", "-d", "v1.10.9")
+        self.git("tag", "v99.0.0")
+
+        result = self.release("\nyes\n")
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("Latest stable tag on origin: v1.10.9", result.stdout)
+        self.assertIn("Release version [v1.10.10]", result.stdout)
+        self.assertIn("v1.10.10", self.git("tag", "--list", cwd=self.remote).splitlines())
+
     def test_pushes_only_the_confirmed_annotated_tag(self) -> None:
         self.git("tag", "-a", "v0.0.1", "-m", "Do not publish")
         self.git("config", "push.followTags", "true")

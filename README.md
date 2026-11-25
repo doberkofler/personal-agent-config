@@ -142,8 +142,11 @@ From a clean `main` checkout that matches `origin/main`, run:
 python3 release.py
 ```
 
-Enter an unused version such as `v1.0.0`. Review the commit and confirm to create
-and push the annotated tag. [GitHub Actions](.github/workflows/release.yml) tests
+The prompt shows the highest stable `vX.Y.Z` tag on `origin`.
+Press Enter to accept the next patch version (`v1.0.0` if there is no stable tag),
+or enter a different unused version.
+Review the commit and confirm to create and push the annotated tag.
+[GitHub Actions](.github/workflows/release.yml) tests
 the tagged commit, builds the archive and checksum, and publishes both to
 [GitHub Releases](https://github.com/doberkofler/personal-agent-config/releases).
 Local installation is a separate step.
