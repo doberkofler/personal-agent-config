@@ -7,6 +7,7 @@ the **TypeScript Best Practices** baseline; this section does not restate them.
 
 ## Component Design
 
+- Prefer function components for new code.
 - One component = one responsibility; split when a second concern appears.
 - Keep components under ~100 lines (advisory guideline, not enforced; concrete
   limits are project-specific).
@@ -16,6 +17,8 @@ the **TypeScript Best Practices** baseline; this section does not restate them.
 - One primary component per file; follow the baseline file-naming policy.
 - Type props explicitly with a named `Props` type and follow the baseline immutability
   policy.
+- Prefer destructuring props in the component signature, e.g. `function FieldLabel({label}: Props)`.
+  Keep a named `props` parameter when the component needs the object as a whole.
 
 ## Hooks
 

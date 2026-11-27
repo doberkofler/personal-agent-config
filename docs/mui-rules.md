@@ -8,6 +8,8 @@ version-bound, follow the latest stable MUI.
 - Prefer the `sx` prop for simple, one-off styles.
 - Use MUI's `styled()` API for complex or reusable styles.
 - Avoid the native `style` prop.
+- Prefer explicit units for ambiguous `sx` dimensions: `width: 1` means `100%`;
+  use `'1px'` for one pixel.
 
 ## Color and Theming
 
@@ -29,6 +31,8 @@ version-bound, follow the latest stable MUI.
 - Every new or changed UI must remain readable and visually coherent in light,
   dark, and system modes, including dialogs, menus, empty states, hover/focus
   states, and disabled controls.
+- Use the app's theme when testing theme-dependent UI and cover the relevant
+  color schemes.
 
 ## Portaled Overlays
 

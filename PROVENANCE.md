@@ -179,6 +179,12 @@ documentation. Verify version-sensitive claims against primary vendor documentat
 before changing them. Record an external source here if a future document is imported
 or substantially adapted from one.
 
+`react-rules.md` follows [React's guidance to prefer function components](https://react.dev/reference/react/Component).
+Destructuring props in the signature is a local style preference.
+`mui-rules.md` bases its explicit-unit guidance on the
+[MUI System sizing transform](https://mui.com/system/sizing/#supported-values).
+Testing theme-dependent UI with the app's theme is local policy.
+
 `sql-plsql-rules.md` requires uppercase keywords and lowercase non-keyword code,
 with case preserved in quoted identifiers and string literals. This is local formatting
 policy, not an Oracle requirement.
